@@ -1,0 +1,5 @@
+------------------------------------------------------------------------
+1 . Obecny folder roboczy
+------------------------------------------------------------------------
+ std::filesystem::path current_path = std::filesystem::current_path();
+ std::cout << "Obecny folder roboczy: " << current_path << std::endl;
