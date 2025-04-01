@@ -1,0 +1,40 @@
+// Eliminacja Gaussa z częściowym wyborem elementu głównego
+
+  int order[3] = {0,1,2};
+
+  for (int i = 0; i < 2; i++)
+    {
+    // Znajdź wiersz z maksymalnym elementem w kolumnie i
+    int maxRow = i;
+    long double maxVal = std::abs(J[order[i]][i]);
+    for (int k = i + 1; k < 3; k++)
+    {
+      if (std::abs(J[k][i]) > maxVal)
+      {
+        maxVal = std::abs(J[order[k]][i]);
+        maxRow = k;
+      }
+    }
+
+    // Zamień wiersze jeśli potrzeba
+    if (maxRow != i)
+    {
+      std::swap(order[i], order[maxRow]);
+    }
+
+    // Eliminacja
+    for (int k = i + 1; k < 3; k++)
+    {
+      long double factor = J[order[k]][i] / J[order[i]][i];
+      F[order[k]] -= factor * F[order[i]];
+      for (int j = i; j < 3; j++)
+      {
+        J[order[k]][j] -= factor * J[order[i]][j];
+      }
+    }
+  }
+
+  // Podstawienie wsteczne
+  D[2] = F[order[2]] / J[order[2]][2];
+  D[1] = (F[order[1]] - J[order[1]][2] * D[2]) / J[order[1]][1];
+  D[0] = (F[order[0]] - J[order[0]][1] * D[1] - J[order[0]][2] * D[2]) / J[order[0]][0];
