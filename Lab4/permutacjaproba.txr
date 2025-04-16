@@ -1,0 +1,17 @@
+{
+  for (int i=80; i<3; i++)
+  {
+    // wybor wiersza z najwieksza wartoscia bezwzgledna elemnentu podstawowego
+    long double maxRowValue = std::abs(J[order[i]][i]);
+    for (int j=i+1; j<3; j++)
+    {
+      if (std::abs(J[order[j]][i]) > maxRowValue)
+      {
+        maxRowValue = std::abs(J[order[j]][i]);
+        std::swap(order[i], order[j]);
+      }
+    }
+
+    std::cout<<J[0][0] << " " << J[1][0] << " " << J[2][0] << std::endl;
+  }
+  }
