@@ -1,0 +1,10 @@
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab1.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab2.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab3.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab4.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab5.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab6.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab9.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/lab10.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/edit_cache.dir
+/home/andrzej/Documents/SEM_4/MO/repozytorium/cmake-build-debug/CMakeFiles/rebuild_cache.dir

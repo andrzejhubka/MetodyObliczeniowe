@@ -16,12 +16,6 @@ struct dataPoint
     long double PMT_blad_bezwzgledny;
 };
 
-long double Y0 = 2.l, dt = 0.0001l, tf = 1.l;
-// GENERUJEMY TABLICE Z WYNIKAMI
-int n = static_cast<int>(tf/dt);
-std::vector<dataPoint> data(n);
-
-
 // F z rownania RR
 long double f(long double t, long double y)
 {
@@ -34,7 +28,7 @@ double y_analytical(long double t)
     return 1.l + pow((1.l + t),90.l) * exp(-100.l * t);
 }
 
-void BME(long double y0, long double dt, long double tf)
+void BME(long double y0, long double dt, long double tf, std::vector<dataPoint> &data)
 {
     long double t = 0;
     long double y = y0;
@@ -50,7 +44,7 @@ void BME(long double y0, long double dt, long double tf)
 
 }
 
-void PME(long double y0, long double dt, long double tf)
+void PME(long double y0, long double dt, long double tf, std::vector<dataPoint> &data)
 {
     long double t = 0;
     long double y = y0;
@@ -65,55 +59,66 @@ void PME(long double y0, long double dt, long double tf)
     }
 }
 
-void PMT(long double y0, long double dt, long double tf)
+void PMT(long double y0, long double dt, long double tf, std::vector<dataPoint> &data)
 {
-    long double t = 0;
+    long double t = 0.L;
     long double y = y0;
     data[0].PMT_result = y;
+    data[0].PMT_blad_bezwzgledny = fabsl(y - data[0].y_analitical);
 
-    for (int i = 0; i < data.size(); i++)
+    for (int i = 1; i < data.size(); i++)
     {
+        long double t_prev = t;
         t += dt;
-        y = (2.l*y + dt * f(t, y) + dt * (100*t+10) / (t+1)) / (2.l + dt * (100.l*t + 10.l) / (t+1.l));
+        long double a_prev = (100.L * t_prev + 10.L) / (t_prev + 1.L);
+        long double a_now  = (100.L * t + 10.L) / (t + 1.L);
+
+        // Poprawiona formuła trapezów:
+        y = (y - dt/2.L * a_prev * (y - 1.L) + dt/2.L * a_now) / (1.L + dt/2.L * a_now);
+
         data[i].PMT_result = y;
-        data[i].PMT_blad_bezwzgledny = fabs(y - y_analytical(t));
+        data[i].PMT_blad_bezwzgledny = fabsl(y - data[i].y_analitical);
     }
 }
 
 int main()
 {
-    for (int i = 0; i < n; i++)
-    {
-        data[i].t = i*dt;
-        data[i].y_analitical = y_analytical(data[i].t);
-    }
+    std::vector<long double> dt_values = {0.2L,0.1L,0.08L,0.05L,0.04L,0.03L,0.025L,0.02L,0.015L,0.01L,0.0075L,0.005L,0.0025L,0.001L,0.0005L,0.0002L,0.0001L,0.00005L,0.00002L,0.00001L};
+    long double Y0 = 2.l, tf = 1.l;
 
-    //ZGODNIE Z OBLCIZENIAMI ABY BME BYŁA STABILNA dt < 1/50
-    BME(Y0, dt, tf);
-
-    // PME BEZWARUNKOWO STABILNA
-    PME(Y0, dt, tf);
-
-    // PMT BEZWARUNKOWO STABILNA
-    PMT(Y0, dt, tf);
-
-    // ZAPISUJEMY WYNIKI
+    // OTWARCIE PLIKU
     std::ofstream file("wyniki.csv");
     if (!file.is_open())
     {
         std::cerr << "Nie udało się otworzyć pliku do zapisu!\n";
         return 1;
     }
-    file << "t,analityczne,BME,BME_blad,PME,PME_blad,PMT,PMT_blad\n";
+    file << "dt,t,analityczne,BME,BME_blad,PME,PME_blad,PMT,PMT_blad\n";
 
-
-    for (const auto& point : data)
+    for (auto dt : dt_values)
     {
-        file <<std::fixed<<std::setprecision(16)<<
-            point.t << "," << point.y_analitical << ","
-        << point.BME_result << ","<<point.BME_blad_bezwzgledny<<","
-        << point.PME_result << "," <<point.PME_blad_bezwzgledny<<","
-        << point.PMT_result <<","<< point.PMT_blad_bezwzgledny <<"\n";
+        int n = static_cast<int>(tf/dt)+1;
+        std::vector<dataPoint> data(n);
+
+        for (int i = 0; i < n; i++)
+        {
+            data[i].t = i*dt;
+            data[i].y_analitical = y_analytical(data[i].t);
+        }
+
+        BME(Y0, dt, tf, data);
+        PME(Y0, dt, tf, data);
+        PMT(Y0, dt, tf, data);
+
+        for (const auto& point : data)
+        {
+            file << std::fixed << std::setprecision(16)
+                 << dt << ","
+                 << point.t << "," << point.y_analitical << ","
+                 << point.BME_result << "," << point.BME_blad_bezwzgledny << ","
+                 << point.PME_result << "," << point.PME_blad_bezwzgledny << ","
+                 << point.PMT_result << "," << point.PMT_blad_bezwzgledny << "\n";
+        }
     }
 
     file.close();
