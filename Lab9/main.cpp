@@ -35,15 +35,22 @@ double u_analitycznie(double x)
     ) * (-1.l + 1.l / std::tanh(sqrt5)) / 64.0l;
 }
 
-double metoda_strzalow(double p, double dx)
+double metoda_strzalow(double p, double dx, std::vector<dataPoint> &data)
 {
     double u2;
     double u1;
     double u0;
     double x = a + 2*dx;
+    int idx = 2;
 
     u0 = 2;
     u1 = u0 + dx * p;
+
+    data[0].u_strzaly = u0;
+    data[0].blad_strzaly = fabs(u0 - u_analitycznie(a));
+
+    data[1].u_strzaly = u1;
+    data[1].blad_strzaly = fabs(u1 - u_analitycznie(a + dx));
 
     while (x <= b + 1e-12 )
     {
@@ -54,11 +61,14 @@ double metoda_strzalow(double p, double dx)
 
         double u2 = -(B * u1 + C * u0 + F) / A;
 
-        std::cout <<std::fixed<<std::setprecision(8)<< "x: " << x << " y: " << u2 << " Analitycznie: " << u_analitycznie(x) << std::endl;
+        data[idx].u_strzaly = u2;
+        data[idx].blad_strzaly = fabs(u2 - data[idx].u_analitycznie);
+        idx++;
 
         u0 = u1;
         u1 = u2;
         x += dx;
+
     }
 
     return u1;
@@ -84,7 +94,7 @@ void thomas_algorithm(const std::vector<double>& lower,
     }
 }
 
-void thomas_method(double h, const std::string& filename)
+void thomas_method(double h, const std::string& filename, std::vector<dataPoint>& data)
 {
     int N = static_cast<int>((b - a)/h);
     std::vector<double> x(N+1), U(N+1);
@@ -92,9 +102,8 @@ void thomas_method(double h, const std::string& filename)
 
     // Ustaw siatkę i układ równań
     for (int i = 0; i <= N; ++i)
-    {
         x[i] = a + i*h;
-    }
+
     for (int i = 1; i < N; ++i) {
         lower[i] = 1.0/(h*h) - 1.0/h;
         main[i]  = -2.0/(h*h) - 4.0;
@@ -103,7 +112,9 @@ void thomas_method(double h, const std::string& filename)
     }
     // Warunki brzegowe
     main[0] = 1.0; upper[0] = 0.0; rhs[0] = UA;
-    lower[N] = 0.0; main[N] = 1.0; rhs[N] = UB;
+    // lower[0] = 0.0; // niepotrzebne, bo nieużywane
+    main[N] = 1.0; rhs[N] = UB;
+    // upper[N] i lower[N] NIE ISTNIEJĄ
 
     // Algorytm Thomasa
     // Eliminacja w przód
@@ -120,29 +131,65 @@ void thomas_method(double h, const std::string& filename)
         U[i] = (rhs[i] - upper[i] * U[i+1]) / main[i];
     }
 
-    // Zapis do pliku: x, U_num, U_analyt
-    std::ofstream file(filename);
-    file << std::scientific << std::setprecision(12);
+    // Wypełnij dane do dataPoint
     for (int i = 0; i <= N; ++i)
     {
-        file << x[i] << " " << U[i] << " " << u_analitycznie(x[i]) << "\n";
+        data[i].u_thomas = U[i];
+        data[i].blad_thomas = std::abs(U[i] - data[i].u_analitycznie);
     }
 }
 
 int main()
 {
+    std::vector<double> dx_values = {0.2, 0.1421, 0.1010, 0.0718, 0.0510, 0.0363, 0.0258, 0.0183, 0.0130, 0.0093, 0.0066, 0.0047, 0.0033, 0.0024, 0.0017, 0.0012, 0.00085, 0.00060, 0.00043, 0.00030, 0.00022, 0.00015, 0.00011, 7.8e-05, 5.5e-05, 3.9e-05, 2.8e-05, 2.0e-05, 1.4e-05, 1.0e-05};
     double p1 = -10.0;
     double p2 = 10.0;
 
-    double U1 = metoda_strzalow(p1, 0.001);
-    double U2 = metoda_strzalow(p2, 0.001);
 
-    double p_opt = p1 + (p2 - p1)*(UB - U1)/(U2 - U1);
+    // OTWARCIE PLIKU
+    std::ofstream file("wyniki.csv");
+    if (!file.is_open())
+    {
+        std::cerr << "Nie udało się otworzyć pliku do zapisu!\n";
+        return 1;
+    }
+    file << "dx,x,analityczne,strzaly,strzaly_blad,thomas,thomas_blad\n";
 
-    std::cout << "\nOptymalne p: " << std::setprecision(10) << p_opt << "\n\n";
-    metoda_strzalow(p_opt, 0.001);
+    for (auto dx : dx_values)
+    {
+        int n = static_cast<int>(1/dx)+1;
+        std::vector<dataPoint> data(n);
+        for (int i = 0; i < n; i++)
+        {
+            data[i].x = i*dx;
+            data[i].u_analitycznie = u_analitycznie(data[i].x);
+        }
 
 
-    // Metoda Thomasa
-    thomas_method(0.001, "thomas_results.txt");
+
+        double U1 = metoda_strzalow(p1, dx, data);
+        double U2 = metoda_strzalow(p2, dx, data);
+
+        double p_opt = p1 + (p2 - p1)*(UB - U1)/(U2 - U1);
+
+        std::cout << "\nOptymalne p: " << std::setprecision(10) << p_opt << "\n\n";
+        metoda_strzalow(p_opt, dx, data);
+
+
+        // Metoda Thomasa
+        thomas_method(dx, "thomas_results.txt", data);
+
+
+
+        for (const auto& point : data)
+        {
+            file << std::fixed << std::setprecision(16)
+                 << dx << ","
+                 << point.x << "," << point.u_analitycznie << ","
+                 << point.u_strzaly << "," << point.blad_strzaly << ","
+                 << point.u_thomas << "," << point.blad_thomas << std::endl;
+        }
+    }
+    file.close();
+    std::cout << "Wyniki zapisane do pliku wyniki.csv\n";
 }
