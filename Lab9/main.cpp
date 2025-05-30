@@ -40,10 +40,10 @@ double metoda_strzalow(double p, double dx, std::vector<dataPoint> &data)
     double u2;
     double u1;
     double u0;
-    double x = a + 2*dx;
-    int idx = 2;
+    double x = a + 2.l*dx;
+    int idx = 2.l;
 
-    u0 = 2;
+    u0 = 2.l;
     u1 = u0 + dx * p;
 
     data[0].u_strzaly = u0;
@@ -54,12 +54,12 @@ double metoda_strzalow(double p, double dx, std::vector<dataPoint> &data)
 
     while (x <= b + 1e-12 )
     {
-        double A = 1.0/(dx*dx) + 1.0/dx;
-        double B = -2.0/(dx*dx) - 4.0;
-        double C = 1.0/(dx*dx) - 1.0/dx;
-        double F = -0.5 * x * x * x;
+        double A = 1.0l/(dx*dx) + 1.0l/dx;
+        double B = -2.0l/(dx*dx) - 4.0l;
+        double C = 1.0l/(dx*dx) - 1.0l/dx;
+        double F = -0.5l * x * x * x;
 
-        double u2 = -(B * u1 + C * u0 + F) / A;
+        u2 = (F - B * u1 - C * u0) / A;
 
         data[idx].u_strzaly = u2;
         data[idx].blad_strzaly = fabs(u2 - data[idx].u_analitycznie);
@@ -141,7 +141,7 @@ void thomas_method(double h, const std::string& filename, std::vector<dataPoint>
 
 int main()
 {
-    std::vector<double> dx_values = {0.2, 0.1421, 0.1010, 0.0718, 0.0510, 0.0363, 0.0258, 0.0183, 0.0130, 0.0093, 0.0066, 0.0047, 0.0033, 0.0024, 0.0017, 0.0012, 0.00085, 0.00060, 0.00043, 0.00030, 0.00022, 0.00015, 0.00011, 7.8e-05, 5.5e-05, 3.9e-05, 2.8e-05, 2.0e-05, 1.4e-05, 1.0e-05};
+    std::vector<double> dx_values = {0.2, 0.1421, 0.1010, 0.0718, 0.0510, 0.0363, 0.0258, 0.0183, 0.0130, 0.0093, 0.0066, 0.0047, 0.0033, 0.0024, 0.0017, 0.0012, 0.00085, 0.00060, 0.00043, 0.00030, 0.00022, 0.00015, 0.00011};
     double p1 = -10.0;
     double p2 = 10.0;
 
@@ -172,7 +172,7 @@ int main()
 
         double p_opt = p1 + (p2 - p1)*(UB - U1)/(U2 - U1);
 
-        std::cout << "\nOptymalne p: " << std::setprecision(10) << p_opt << "\n\n";
+        std::cout << "\np: " << std::setprecision(10) << p_opt << "\n\n";
         metoda_strzalow(p_opt, dx, data);
 
 

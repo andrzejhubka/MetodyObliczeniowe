@@ -18,7 +18,7 @@ grouped['log10_thomas_blad'] = np.log10(grouped['thomas_blad'])
 
 plt.figure(figsize=(10, 7))
 plt.plot(grouped['log10_dx'], grouped['log10_strzaly_blad'], 'o-', label='Metoda strzałów', color='#22A7F0')
-plt.plot(grouped['log10_dx'], grouped['log10_thomas_blad'], 's-', label='Metoda Thomasa', color='#FFAA40')
+#plt.plot(grouped['log10_dx'], grouped['log10_thomas_blad'], 's-', label='Metoda Thomasa', color='#FFAA40')
 
 # Linie referencyjne O(h) i O(h^2)
 # Wybierz punkt startowy (np. pierwszy punkt wykresu)
@@ -28,7 +28,7 @@ y0 = grouped['log10_strzaly_blad'].min()  # lub inny punkt na wykresie
 # O(h): nachylenie 1
 plt.plot(grouped['log10_dx'], y0 + (grouped['log10_dx'] - x0)*1, 'k--', label='O(h)')
 # O(h^2): nachylenie 2
-plt.plot(grouped['log10_dx'], y0 + (grouped['log10_dx'] - x0)*2, 'k:', label='O(h²)')
+plt.plot(grouped['log10_dx'], y0 + (grouped['log10_dx'] - x0)**2, 'k:', label='O(h²)')
 
 plt.xlabel('log10(h)')
 plt.ylabel('log10(max |błąd|)')
