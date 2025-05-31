@@ -325,6 +325,12 @@ build CMakeFiles/lab11.dir/Lab11/dependencies/calerf.cpp.o: CXX_COMPILER__lab11_
   OBJECT_DIR = CMakeFiles/lab11.dir
   OBJECT_FILE_DIR = CMakeFiles/lab11.dir/Lab11/dependencies
 
+build CMakeFiles/lab11.dir/Lab11/utilities.cpp.o: CXX_COMPILER__lab11_unscanned_Debug /home/andrzej/CLionProjects/MetodyObliczeniowe/Lab11/utilities.cpp || cmake_object_order_depends_target_lab11
+  DEP_FILE = CMakeFiles/lab11.dir/Lab11/utilities.cpp.o.d
+  FLAGS = -g -fdiagnostics-color=always
+  OBJECT_DIR = CMakeFiles/lab11.dir
+  OBJECT_FILE_DIR = CMakeFiles/lab11.dir/Lab11
+
 
 # =============================================================================
 # Link build statements for EXECUTABLE target lab11
@@ -333,7 +339,7 @@ build CMakeFiles/lab11.dir/Lab11/dependencies/calerf.cpp.o: CXX_COMPILER__lab11_
 #############################################
 # Link the executable lab11
 
-build lab11: CXX_EXECUTABLE_LINKER__lab11_Debug CMakeFiles/lab11.dir/Lab11/main.cpp.o CMakeFiles/lab11.dir/Lab11/dependencies/calerf.cpp.o
+build lab11: CXX_EXECUTABLE_LINKER__lab11_Debug CMakeFiles/lab11.dir/Lab11/main.cpp.o CMakeFiles/lab11.dir/Lab11/dependencies/calerf.cpp.o CMakeFiles/lab11.dir/Lab11/utilities.cpp.o
   DEP_FILE = CMakeFiles/lab11.dir/link.d
   FLAGS = -g
   LINK_FLAGS = -Wl,--dependency-file=CMakeFiles/lab11.dir/link.d
